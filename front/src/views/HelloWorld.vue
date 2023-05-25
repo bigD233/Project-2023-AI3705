@@ -1,7 +1,10 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import Header from '@/components/StartHeader.vue'
-import { CirclePlus, Search, Upload, Select, CloseBold, IceDrink } from '@element-plus/icons-vue'
+import {
+  CirclePlus, Files, Select, CloseBold, IceDrink,
+  IceCreamRound, Mug, Operation, Shop, DeleteFilled
+} from '@element-plus/icons-vue'
 // import SelectComp from '@/components/SelectComp.vue'
 // import Footer from '@/components/StartFooter.vue'
 
@@ -43,6 +46,26 @@ const options = [
   },
 ]
 
+const otherComp = [
+  {
+    value: '调配（混合）'
+  },
+  {
+    value: '粗滤'
+  }, {
+    value: '精滤'
+  }, {
+    value: '碳酸化'
+  }, {
+    value: '过滤'
+  }, {
+    value: '稀释'
+  }, {
+    value: '加热'
+  },
+]
+
+const dialogFormVisible = ref(false);
 
 function judgeSelect() {
   if (typevalue.value != '') {
@@ -50,20 +73,31 @@ function judgeSelect() {
   }
 }
 
-function addComponent() {
+
+function addOtherComponent() {
   if (component.value != '') {
-    if (component.value == 'Source') {
-      component_list.value.push({ value: "源罐" })
+    component_list.value.push({ value: component.value, svg: Operation })
+  }
+}
+
+
+function addComponent() {
+
+  if (component.value != '') {
+    switch (component.value) {
+      case 'Source':
+        component_list.value.push({ value: "源罐", svg: Files });
+        break;
+      case 'Icing':
+        component_list.value.push({ value: "冷却机", svg: IceCreamRound })
+        break;
+      case 'Filling':
+        component_list.value.push({ value: "罐装机", svg: Mug })
+        break;
+      default:
+        dialogFormVisible.value = true;
     }
-    if (component.value == 'Icing') {
-      component_list.value.push({ value: "冷却机" })
-    }
-    if (component.value == 'Filling') {
-      component_list.value.push({ value: "罐装机" })
-    }
-    if (component.value == 'Tank') {
-      component_list.value.push({ value: "多功能罐" })
-    }
+
     component.value = '';
     console.log(component_list.value)
   }
@@ -115,6 +149,25 @@ function clearList() {
             </div>
           </template>
           <div class="mb-2 flex items-center text-sm">
+
+            <el-dialog v-model="dialogFormVisible" title="输入具体工艺名称" draggable style="width:22vmax" align-center>
+
+              <el-select v-model="component" placeholder="输入多功能罐对应的工艺名称" size="large" style="width:100%">
+                <el-option v-for="item in otherComp" :label=item.value :value=item.value />
+
+              </el-select>
+
+
+              <template #footer>
+                <span class="dialog-footer">
+                  <el-button @click="dialogFormVisible = false; component = ''">取消</el-button>
+                  <el-button type="primary" @click="dialogFormVisible = false; addOtherComponent()">
+                    添加
+                  </el-button>
+                </span>
+              </template>
+            </el-dialog>
+
             <el-radio-group v-model="component">
               <!-- <img src="../assets/component_svg/valve_model.svg"  style="width: 35%"/>
               
@@ -142,11 +195,12 @@ function clearList() {
 
           <span style="font-weight:bolder; font-size: larger;">工艺流程：</span>
           <el-button style="float:right" type="primary" @click="clearList"> 清除 &nbsp; <el-icon>
-              <CloseBold />
+              <DeleteFilled />
             </el-icon> </el-button>
           <el-card style="width: 100% ;margin-top: 2vmin;margin-bottom: 2vmin;min-height: 10vmin;">
             <el-steps :active="1">
-              <el-step v-for="item in component_list" :title=item.value />
+
+              <el-step v-for="item in component_list" :title=item.value :icon=item.svg />
             </el-steps>
           </el-card>
           <div>
@@ -163,7 +217,9 @@ function clearList() {
               </div>
 
               <div style="width:20%;text-align: right;">
-                <el-button type="primary">确定&nbsp;<el-icon><Select /></el-icon></el-button>
+                <el-button type="primary" plain size="large">生产&nbsp;<el-icon>
+                    <Shop />
+                  </el-icon></el-button>
               </div>
 
             </el-row>
