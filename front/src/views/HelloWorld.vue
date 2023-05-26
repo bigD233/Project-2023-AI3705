@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router'
 import Header from '@/components/StartHeader.vue'
 import {
   CirclePlus, Files, Select, CloseBold, IceDrink,
-  IceCreamRound, Mug, Operation, Shop, DeleteFilled
+  IceCreamRound, Mug, Operation, Shop, DeleteFilled, Refrigerator
 } from '@element-plus/icons-vue'
 // import SelectComp from '@/components/SelectComp.vue'
 // import Footer from '@/components/StartFooter.vue'
@@ -27,22 +27,27 @@ const options = [
   {
     value: '饮用天然矿泉水',
     label: '饮用天然矿泉水',
+    process: ['源罐', '粗滤', '精滤', '杀菌', '灌装'],
   },
   {
     value: '碳酸饮料',
     label: '碳酸饮料',
+    process: ['源罐', '调配', '制冷', '碳酸化', '杀菌', '灌装'],
   },
   {
     value: '茶饮料',
     label: '茶饮料',
+    process: ['源罐', '调配', '过滤', '杀菌', '灌装'],
   },
   {
     value: '果蔬饮料',
     label: '果蔬饮料',
+    process: ['源罐', '稀释', '调配', '杀菌', '灌装'],
   },
   {
     value: '含乳饮料',
     label: '含乳饮料',
+    process: ['源罐', '加热', '调配', '杀菌', '灌装'],
   },
 ]
 
@@ -70,6 +75,21 @@ const dialogFormVisible = ref(false);
 function judgeSelect() {
   if (typevalue.value != '') {
     is_disable.value = true;
+    component_list.value=[];
+  }
+
+  for (const item of options) {
+    console.log(item);
+    if (item.value == typevalue.value) {
+      
+
+      for (var i = 0; i < item.process.length; i++) {
+        addComponent(item.process[i],2);
+      }
+      break;
+    }
+    console.log(component_list.value)
+    
   }
 }
 
@@ -80,26 +100,10 @@ function addOtherComponent() {
   }
 }
 
-
-function addComponent() {
-
+function addComponent1() {
   if (component.value != '') {
-    switch (component.value) {
-      case 'Source':
-        component_list.value.push({ value: "源罐", svg: Files });
-        break;
-      case 'Icing':
-        component_list.value.push({ value: "冷却机", svg: IceCreamRound })
-        break;
-      case 'Filling':
-        component_list.value.push({ value: "罐装机", svg: Mug })
-        break;
-      default:
-        dialogFormVisible.value = true;
-    }
-
+    addComponent(component.value,1);
     component.value = '';
-    console.log(component_list.value)
   }
   else {
     ElMessage({
@@ -107,6 +111,39 @@ function addComponent() {
       type: 'warning',
     })
   }
+
+}
+
+
+function addComponent(component, num) {
+
+
+  switch (component) {
+    case '源罐':
+      component_list.value.push({ value: "源罐", svg: Files });
+      break;
+    case '冷却':
+      component_list.value.push({ value: "冷却", svg: IceCreamRound })
+      break;
+    case '灌装':
+      component_list.value.push({ value: "灌装", svg: Mug })
+      break;
+    case '杀菌':
+      component_list.value.push({ value: "杀菌", svg: Refrigerator })
+      break;
+    default:
+      if (num == 1) {
+        component = ''
+        dialogFormVisible.value = true;
+      }
+      if (num ==2){
+        component_list.value.push({ value: component, svg: Operation })
+      }
+
+  }
+
+
+
 }
 
 function clearList() {
@@ -145,7 +182,7 @@ function clearList() {
           <template #header>
             <div class="card-header">
               <p>自选工艺类型</p>
-              <el-button type="info" plain :icon="CirclePlus" :disabled="is_disable" @click="addComponent">添加</el-button>
+              <el-button type="info" plain :icon="CirclePlus" :disabled="is_disable" @click="addComponent1">添加</el-button>
             </div>
           </template>
           <div class="mb-2 flex items-center text-sm">
@@ -173,17 +210,20 @@ function clearList() {
               
               <el-radio label="1" size="large" style="width:25% ;margin-left: 3vmax;">阀门(Valve)</el-radio> -->
               <img src="../assets/component_svg/source tank model.svg" style="width: 35%" />
-              <el-radio label="Source" size="large" :disabled="is_disable" style="width:25%;margin-left: 3vmax;">源罐(Source
+              <el-radio label="源罐" size="large" :disabled="is_disable" style="width:25%;margin-left: 3vmax;">源罐(Source
                 Tank)</el-radio>
               <img src="../assets/component_svg/icing machine model.svg" style="width: 35%" />
-              <el-radio label="Icing" size="large" :disabled="is_disable" style="width:25%;margin-left: 3vmax;">冷却机(Icing
+              <el-radio label="冷却" size="large" :disabled="is_disable" style="width:25%;margin-left: 3vmax;">冷却机(Icing
                 Machine)</el-radio>
               <img src="../assets/component_svg/FILLING TANK.svg" style="width: 35%" />
-              <el-radio label="Filling" size="large" :disabled="is_disable"
-                style="width:25% ;margin-left: 3vmax;">罐装机(Filling Machine)</el-radio>
+              <el-radio label="灌装" size="large" :disabled="is_disable" style="width:25% ;margin-left: 3vmax;">罐装机(Filling
+                Machine)</el-radio>
               <img src="../assets/component_svg/tank model.svg" style="width: 35%" />
               <el-radio label="Tank" size="large" :disabled="is_disable" style="width:25%;margin-left: 3vmax;">多功能罐(Tank
                 Model)</el-radio>
+              <img src="../assets/component_svg/pasteurization.svg" style="width: 35%" />
+              <el-radio label="杀菌" size="large" :disabled="is_disable"
+                style="width:25%;margin-left: 3vmax;">巴氏消毒(Pasteurization Machine)</el-radio>
             </el-radio-group>
           </div>
         </el-card>
