@@ -53,7 +53,7 @@ const options = [
 
 const otherComp = [
   {
-    value: '调配（混合）'
+    value: '调配'
   },
   {
     value: '粗滤'
@@ -104,6 +104,7 @@ function addComponent1() {
   if (component.value != '') {
     addComponent(component.value,1);
     component.value = '';
+    checkCorrection();
   }
   else {
     ElMessage({
@@ -112,6 +113,22 @@ function addComponent1() {
     })
   }
 
+}
+
+function checkCorrection(){
+  for(const item of options){
+    if(component_list.value.length==item.process.length){
+      var flag=true;
+      for(var i=0;i<item.process.length;i++){
+        if (component_list.value[i].value!=item.process[i]){
+          flag=false;
+        }
+      }
+      if(flag){
+        typevalue.value=item.value;
+      }
+    }
+  }
 }
 
 
