@@ -24,44 +24,69 @@ function jump_to_login() {
 
 var timer  //计时器
 var url = img0
+const count = ref(0)  //进度条计数
 const num = ref(1000)
 const component_list = ref([])
 const component = ref('')    // 工艺名称
 const typevalue = ref('')   // 饮料种类名称
 const percentage = ref(0)  // 进度条百分比
 const if_increase = ref(true)  //是否继续增长
-const is_disable = ref(false)
+const if_disable = ref(false)
+const remarkCaruselUp = ref(null)
+
+const img_lists = [
+  {
+    value: img1
+  },
+  {
+    value: img2
+  },
+  {
+    value: img3
+  },
+  {
+    value: img4
+  },
+  {
+    value: img5
+  },
+]
 
 const options = [
   {
     value: '饮用天然矿泉水',
     label: '饮用天然矿泉水',
     process: ['源罐', '粗滤', '精滤', '杀菌', '灌装'],
-    src: img1
+    src: img1,
+    index: 0
   },
   {
     value: '碳酸饮料',
     label: '碳酸饮料',
     process: ['源罐', '调配', '制冷', '碳酸化', '杀菌', '灌装'],
-    src: img2
+    src: img2,
+    index: 1
   },
   {
     value: '茶饮料',
     label: '茶饮料',
     process: ['源罐', '调配', '过滤', '杀菌', '灌装'],
-    src: img3
+    src: img3,
+    index: 2
   },
   {
     value: '果蔬饮料',
     label: '果蔬饮料',
     process: ['源罐', '稀释', '调配', '杀菌', '灌装'],
-    src: img4
+    src: img4,
+    index: 3
   },
   {
     value: '含乳饮料',
     label: '含乳饮料',
     process: ['源罐', '加热', '调配', '杀菌', '灌装'],
-    src: img5
+    src: img5,
+    index: 4
   },
 ]
 
@@ -91,7 +116,7 @@ function percentage_increase() {
   if (component_list.value.length != 0) {
     if (if_increase){
       timer = setInterval(increase, 1500);   
-      if_increase.value = false
+      if_increase.value = false;
     }
   }
   else {
@@ -105,14 +130,13 @@ function percentage_increase() {
 
 function increase() {
   var step = 100/component_list.value.length
-  if (Math.abs(percentage.value - 100)>1) {
-    if (Number((percentage.value + step).toFixed(1)) > 100){
-      percentage.value = 100
-      if_increase.value = false
-    }
-    else {
-      percentage.value = Number((percentage.value +step).toFixed(1));
-    }
+  if (Math.abs(percentage.value +step - 100)>1) {
+    percentage.value = Number((percentage.value +step).toFixed(1));
+    count.value += 1;
+  }
+  else {
+    percentage.value = 100;
+    count.value += 1;
   }
 }
 
@@ -121,14 +145,14 @@ function increase() {
 
 function judgeSelect() {  //选择饮料
   if (typevalue.value != '') {
-    is_disable.value = true;
+    if_disable.value = true;  //配方确定，停止选择
     component_list.value=[];
   }
 
   for (const item of options) {
     console.log(item);
     if (item.value == typevalue.value) {  //找到配方
-      
+      remarkCaruselUp.value.setActiveItem(item.index)
       url = item.src
       console.log(item.src);
       for (var i = 0; i < item.process.length; i++) {
@@ -172,8 +196,10 @@ function checkCorrection(){
           flag=false;
         }
       }
-      if(flag){
+      if(flag){  //找到饮料
+        if_disable.value = true
         typevalue.value=item.value;
+        setActiveItem(item.index)
         url = item.src
         console.log(item.src)
       }
@@ -217,11 +243,12 @@ function clearList() {
   typevalue.value = '';
   component_list.value = [];
   component.value = '';
-  is_disable.value = false;
+  if_disable.value = false;
   percentage.value = 0;
   if_increase.value = true;
   clearInterval(timer);
   url = img0;
+  count.value = 0;
 }
 
 </script>
@@ -253,7 +280,7 @@ function clearList() {
           <template #header>
             <div class="card-header">
               <p>自选工艺类型</p>
-              <el-button type="info" plain :icon="CirclePlus" :disabled="is_disable" @click="addComponent1">添加</el-button>
+              <el-button type="info" plain :icon="CirclePlus" :disabled="if_disable" @click="addComponent1">添加</el-button>
             </div>
           </template>
           <div class="mb-2 flex items-center text-sm">
@@ -281,19 +308,19 @@ function clearList() {
               
               <el-radio label="1" size="large" style="width:25% ;margin-left: 3vmax;">阀门(Valve)</el-radio> -->
               <img src="../assets/component_svg/source tank model.svg" style="width: 35%" />
-              <el-radio label="源罐" size="large" :disabled="is_disable" style="width:25%;margin-left: 3vmax;">源罐(Source
+              <el-radio label="源罐" size="large" :disabled="if_disable" style="width:25%;margin-left: 3vmax;">源罐(Source
                 Tank)</el-radio>
               <img src="../assets/component_svg/icing machine model.svg" style="width: 35%" />
-              <el-radio label="冷却" size="large" :disabled="is_disable" style="width:25%;margin-left: 3vmax;">冷却机(Icing
+              <el-radio label="冷却" size="large" :disabled="if_disable" style="width:25%;margin-left: 3vmax;">冷却机(Icing
                 Machine)</el-radio>
               <img src="../assets/component_svg/FILLING TANK.svg" style="width: 35%" />
-              <el-radio label="灌装" size="large" :disabled="is_disable" style="width:25% ;margin-left: 3vmax;">罐装机(Filling
+              <el-radio label="灌装" size="large" :disabled="if_disable" style="width:25% ;margin-left: 3vmax;">罐装机(Filling
                 Machine)</el-radio>
               <img src="../assets/component_svg/tank model.svg" style="width: 35%" />
-              <el-radio label="Tank" size="large" :disabled="is_disable" style="width:25%;margin-left: 3vmax;">多功能罐(Tank
+              <el-radio label="Tank" size="large" :disabled="if_disable" style="width:25%;margin-left: 3vmax;">多功能罐(Tank
                 Model)</el-radio>
               <img src="../assets/component_svg/pasteurization.svg" style="width: 35%" />
-              <el-radio label="杀菌" size="large" :disabled="is_disable"
+              <el-radio label="杀菌" size="large" :disabled="if_disable"
                 style="width:25%;margin-left: 3vmax;">巴氏消毒(Pasteurization Machine)</el-radio>
             </el-radio-group>
           </div>
@@ -302,6 +329,25 @@ function clearList() {
       </el-aside>
 
       <el-main width="50vmax"  style="margin: 3vmin;">
+        <!-- 图片部分-->
+
+        <!-- <el-card style="margin-top: 4vmin;">
+          <div>
+            <img :src="url" style=" margin-left: 1vmin; height: 40vmin;" />
+          </div>
+          <el-progress :percentage="percentage" :color="customColorMethod" :stroke-width="10" />
+        </el-card> -->
+        <el-carousel ref="remarkCaruselUp" :autoplay="!if_disable" style=" margin-left: 1vmin; height: 40vmin; margin-top: 4vmin;" >
+          <el-carousel-item v-for="img in img_lists" :key="img" style="height: 50vmin; margin-left: 2vmin;">
+            <img :src="img.value" style=" height: 40vmin;">
+          </el-carousel-item>
+        </el-carousel>
+        <el-progress :percentage="percentage" :color="customColorMethod" :stroke-width="10" style="margin-top: 1vmin;"/>
+
+
+
+
+        <!-- 流程部分-->
         <el-card style="margin-top: 4vmin;">
 
           <span style="font-weight:bolder; font-size: larger;">工艺流程：</span>
@@ -309,7 +355,7 @@ function clearList() {
               <DeleteFilled />
             </el-icon> </el-button>
           <el-card style="width: 100% ;margin-top: 2vmin;margin-bottom: 2vmin;min-height: 10vmin;">
-            <el-steps :active="percentage/20">
+            <el-steps :active="count">
 
               <el-step v-for="item in component_list" :key="item.value" :title=item.value :icon=item.svg />
             </el-steps>
@@ -337,12 +383,7 @@ function clearList() {
           </div>
 
         </el-card>
-        <el-card style="margin-top: 4vmin;">
-          <div>
-            <img :src="url" style=" margin-left: 1vmin; height: 40vmin;" />
-          </div>
-          <el-progress :percentage="percentage" :color="customColorMethod" :stroke-width="10" />
-        </el-card>
+
 
       </el-main>
     </el-container>
