@@ -23,7 +23,7 @@ function jump_to_login() {
 }
 
 var timer  //计时器
-var url = img0
+const url = ref('')
 const count = ref(0)  //进度条计数
 const num = ref(1000)
 const component_list = ref([])
@@ -32,7 +32,8 @@ const typevalue = ref('')   // 饮料种类名称
 const percentage = ref(0)  // 进度条百分比
 const if_increase = ref(true)  //是否继续增长
 const if_disable = ref(false)
-const remarkCaruselUp = ref(null)
+const if_show = ref(true)  //是否展示走马灯
+// const remarkCaruselUp = ref(null)
 
 const img_lists = [
   {
@@ -114,8 +115,8 @@ const dialogFormVisible = ref(false);
 
 function percentage_increase() {
   if (component_list.value.length != 0) {
-    if (if_increase){
-      timer = setInterval(increase, 1500);   
+    if (if_increase) {
+      timer = setInterval(increase, 1500);
       if_increase.value = false;
     }
   }
@@ -129,15 +130,18 @@ function percentage_increase() {
 
 
 function increase() {
-  var step = 100/component_list.value.length
-  if (Math.abs(percentage.value +step - 100)>1) {
-    percentage.value = Number((percentage.value +step).toFixed(1));
-    count.value += 1;
+  var step = 100 / component_list.value.length
+  if(percentage.value<100){
+    if (Math.abs(percentage.value + step - 100) > 1) {
+      percentage.value = Number((percentage.value + step).toFixed(1));
+      count.value += 1;
+    }
+    else {
+      percentage.value = 100;
+      count.value += 1;
+    }
   }
-  else {
-    percentage.value = 100;
-    count.value += 1;
-  }
+  
 }
 
 
@@ -146,22 +150,23 @@ function increase() {
 function judgeSelect() {  //选择饮料
   if (typevalue.value != '') {
     if_disable.value = true;  //配方确定，停止选择
-    component_list.value=[];
+    component_list.value = [];
+    if_show.value = false;
   }
 
   for (const item of options) {
     console.log(item);
     if (item.value == typevalue.value) {  //找到配方
-      remarkCaruselUp.value.setActiveItem(item.index)
-      url = item.src
+      // remarkCaruselUp.value.setActiveItem(item.index)
+      url.value = item.src
       console.log(item.src);
       for (var i = 0; i < item.process.length; i++) {
-        addComponent(item.process[i],2);  //添加配方
+        addComponent(item.process[i], 2);  //添加配方
       }
       break;
     }
     // console.log(component_list.value)
-    
+
   }
 }
 
@@ -174,7 +179,7 @@ function addOtherComponent() {
 
 function addComponent1() {  //加单个装置
   if (component.value != '') {
-    addComponent(component.value,1);
+    addComponent(component.value, 1);
     component.value = '';
     checkCorrection();
   }
@@ -187,20 +192,21 @@ function addComponent1() {  //加单个装置
 
 }
 
-function checkCorrection(){
-  for(const item of options){
-    if(component_list.value.length==item.process.length){
-      var flag=true;
-      for(var i=0;i<item.process.length;i++){
-        if (component_list.value[i].value!=item.process[i]){
-          flag=false;
+function checkCorrection() {
+  for (const item of options) {
+    if (component_list.value.length == item.process.length) {
+      var flag = true;
+      for (var i = 0; i < item.process.length; i++) {
+        if (component_list.value[i].value != item.process[i]) {
+          flag = false;
         }
       }
-      if(flag){  //找到饮料
+      if (flag) {  //找到饮料
         if_disable.value = true
-        typevalue.value=item.value;
-        setActiveItem(item.index)
-        url = item.src
+        typevalue.value = item.value;
+        // setActiveItem(item.index)
+        url.value = item.src
+        if_show.value=false;
         console.log(item.src)
       }
     }
@@ -213,7 +219,7 @@ function addComponent(component, num) {
 
   switch (component) {
     case '源罐':
-      component_list.value.push({ value: "源罐", svg: markRaw(Files)});
+      component_list.value.push({ value: "源罐", svg: markRaw(Files) });
       break;
     case '冷却':
       component_list.value.push({ value: "冷却", svg: markRaw(IceCreamRound) })
@@ -229,7 +235,7 @@ function addComponent(component, num) {
         component = ''
         dialogFormVisible.value = true;
       }
-      if (num ==2){
+      if (num == 2) {
         component_list.value.push({ value: component, svg: markRaw(Operation) })
       }
 
@@ -247,8 +253,9 @@ function clearList() {
   percentage.value = 0;
   if_increase.value = true;
   clearInterval(timer);
-  url = img0;
+  url.value = '';
   count.value = 0;
+  if_show.value = true;
 }
 
 </script>
@@ -328,7 +335,7 @@ function clearList() {
 
       </el-aside>
 
-      <el-main width="50vmax"  style="margin: 3vmin;">
+      <el-main width="50vmax" style="margin: 3vmin;">
         <!-- 图片部分-->
 
         <!-- <el-card style="margin-top: 4vmin;">
@@ -337,12 +344,24 @@ function clearList() {
           </div>
           <el-progress :percentage="percentage" :color="customColorMethod" :stroke-width="10" />
         </el-card> -->
-        <el-carousel ref="remarkCaruselUp" :autoplay="!if_disable" style=" margin-left: 1vmin; height: 40vmin; margin-top: 4vmin;" >
-          <el-carousel-item v-for="img in img_lists" :key="img" style="height: 50vmin; margin-left: 2vmin;">
-            <img :src="img.value" style=" height: 40vmin;">
-          </el-carousel-item>
-        </el-carousel>
-        <el-progress :percentage="percentage" :color="customColorMethod" :stroke-width="10" style="margin-top: 1vmin;"/>
+
+        <el-card style="margin-top: 4vmin;">
+          <div v-if="!if_show" style="height:40vmin">
+            <img :src="url" style=" margin-left: 1vmin; width:100%" />
+            <el-progress :percentage="percentage" :color="customColorMethod" :stroke-width="10" style="margin-top: 1vmin;" />
+          </div>
+          <el-carousel v-if="if_show" ref="remarkCaruselUp" autoplay :interval="4000" type="card"
+            style=" margin-left: 1vmin; height: 40vmin; ">
+            <el-carousel-item v-for="img in img_lists" :key="img" style="height: 50vmin; margin-left: 2vmin;">
+              <div style=" height: 35vmin;">
+                <img :src="img0" style=" width: 100%;"/>
+              </div>
+              
+            </el-carousel-item>
+          </el-carousel>
+        </el-card>
+
+        <!-- <el-progress :percentage="percentage" :color="customColorMethod" :stroke-width="10" style="margin-top: 1vmin;"/> -->
 
 
 
