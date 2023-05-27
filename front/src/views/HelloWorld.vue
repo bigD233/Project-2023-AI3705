@@ -5,8 +5,16 @@ import {
   CirclePlus, Files, Select, CloseBold, IceDrink,
   IceCreamRound, Mug, Operation, Shop, DeleteFilled, Refrigerator
 } from '@element-plus/icons-vue'
+import img1 from '../assets/1.png'
+import img2 from '../assets/2.png'
+import img3 from '../assets/3.png'
+import img4 from '../assets/4.png'
+import img5 from '../assets/5.png'
+import img0 from '../assets/logo.png'
+import { markRaw, ref } from 'vue'
 // import SelectComp from '@/components/SelectComp.vue'
 // import Footer from '@/components/StartFooter.vue'
+
 
 const router = useRouter()
 
@@ -14,13 +22,14 @@ function jump_to_login() {
   router.push('/start')
 }
 
-import { ref } from 'vue'
-
+var timer  //计时器
+var url = img0
 const num = ref(1000)
 const component_list = ref([])
 const component = ref('')    // 工艺名称
 const typevalue = ref('')   // 饮料种类名称
-
+const percentage = ref(0)  // 进度条百分比
+const if_increase = ref(true)  //是否继续增长
 const is_disable = ref(false)
 
 const options = [
@@ -28,26 +37,31 @@ const options = [
     value: '饮用天然矿泉水',
     label: '饮用天然矿泉水',
     process: ['源罐', '粗滤', '精滤', '杀菌', '灌装'],
+    src: img1
   },
   {
     value: '碳酸饮料',
     label: '碳酸饮料',
     process: ['源罐', '调配', '制冷', '碳酸化', '杀菌', '灌装'],
+    src: img2
   },
   {
     value: '茶饮料',
     label: '茶饮料',
     process: ['源罐', '调配', '过滤', '杀菌', '灌装'],
+    src: img3
   },
   {
     value: '果蔬饮料',
     label: '果蔬饮料',
     process: ['源罐', '稀释', '调配', '杀菌', '灌装'],
+    src: img4
   },
   {
     value: '含乳饮料',
     label: '含乳饮料',
     process: ['源罐', '加热', '调配', '杀菌', '灌装'],
+    src: img5
   },
 ]
 
@@ -72,7 +86,40 @@ const otherComp = [
 
 const dialogFormVisible = ref(false);
 
-function judgeSelect() {
+
+function percentage_increase() {
+  if (component_list.value.length != 0) {
+    if (if_increase){
+      timer = setInterval(increase, 1500);   
+      if_increase.value = false
+    }
+  }
+  else {
+    ElMessage({
+      message: '您未选择任何一项加工工艺！',
+      type: 'warning',
+    })
+  }
+}
+
+
+function increase() {
+  var step = 100/component_list.value.length
+  if (Math.abs(percentage.value - 100)>1) {
+    if (Number((percentage.value + step).toFixed(1)) > 100){
+      percentage.value = 100
+      if_increase.value = false
+    }
+    else {
+      percentage.value = Number((percentage.value +step).toFixed(1));
+    }
+  }
+}
+
+
+
+
+function judgeSelect() {  //选择饮料
   if (typevalue.value != '') {
     is_disable.value = true;
     component_list.value=[];
@@ -80,15 +127,16 @@ function judgeSelect() {
 
   for (const item of options) {
     console.log(item);
-    if (item.value == typevalue.value) {
+    if (item.value == typevalue.value) {  //找到配方
       
-
+      url = item.src
+      console.log(item.src);
       for (var i = 0; i < item.process.length; i++) {
-        addComponent(item.process[i],2);
+        addComponent(item.process[i],2);  //添加配方
       }
       break;
     }
-    console.log(component_list.value)
+    // console.log(component_list.value)
     
   }
 }
@@ -96,11 +144,11 @@ function judgeSelect() {
 
 function addOtherComponent() {
   if (component.value != '') {
-    component_list.value.push({ value: component.value, svg: Operation })
+    component_list.value.push({ value: component.value, svg: markRaw(Operation) })
   }
 }
 
-function addComponent1() {
+function addComponent1() {  //加单个装置
   if (component.value != '') {
     addComponent(component.value,1);
     component.value = '';
@@ -126,6 +174,8 @@ function checkCorrection(){
       }
       if(flag){
         typevalue.value=item.value;
+        url = item.src
+        console.log(item.src)
       }
     }
   }
@@ -137,24 +187,24 @@ function addComponent(component, num) {
 
   switch (component) {
     case '源罐':
-      component_list.value.push({ value: "源罐", svg: Files });
+      component_list.value.push({ value: "源罐", svg: markRaw(Files)});
       break;
     case '冷却':
-      component_list.value.push({ value: "冷却", svg: IceCreamRound })
+      component_list.value.push({ value: "冷却", svg: markRaw(IceCreamRound) })
       break;
     case '灌装':
-      component_list.value.push({ value: "灌装", svg: Mug })
+      component_list.value.push({ value: "灌装", svg: markRaw(Mug) })
       break;
     case '杀菌':
-      component_list.value.push({ value: "杀菌", svg: Refrigerator })
+      component_list.value.push({ value: "杀菌", svg: markRaw(Refrigerator) })
       break;
     default:
-      if (num == 1) {
+      if (num == 1) {  //多功能罐
         component = ''
         dialogFormVisible.value = true;
       }
       if (num ==2){
-        component_list.value.push({ value: component, svg: Operation })
+        component_list.value.push({ value: component, svg: markRaw(Operation) })
       }
 
   }
@@ -168,12 +218,16 @@ function clearList() {
   component_list.value = [];
   component.value = '';
   is_disable.value = false;
+  percentage.value = 0;
+  if_increase.value = true;
+  clearInterval(timer);
+  url = img0;
 }
 
 </script>
 
 <template>
-  <el-container style="width: 100%; min-height:100%; min-width: 100vmax;">
+  <el-container style="width: 100%; min-height:100%; min-width: 100vmin;">
     <el-header style="margin: 0; padding: 0 ;">
       <Header />
     </el-header>
@@ -207,7 +261,7 @@ function clearList() {
             <el-dialog v-model="dialogFormVisible" title="输入具体工艺名称" draggable style="width:22vmax" align-center>
 
               <el-select v-model="component" placeholder="输入多功能罐对应的工艺名称" size="large" style="width:100%">
-                <el-option v-for="item in otherComp" :label=item.value :value=item.value />
+                <el-option v-for="item in otherComp" :key="item.value" :label=item.value :value=item.value />
 
               </el-select>
 
@@ -247,7 +301,7 @@ function clearList() {
 
       </el-aside>
 
-      <el-main style="margin: 3vmin;">
+      <el-main width="50vmax"  style="margin: 3vmin;">
         <el-card style="margin-top: 4vmin;">
 
           <span style="font-weight:bolder; font-size: larger;">工艺流程：</span>
@@ -255,16 +309,16 @@ function clearList() {
               <DeleteFilled />
             </el-icon> </el-button>
           <el-card style="width: 100% ;margin-top: 2vmin;margin-bottom: 2vmin;min-height: 10vmin;">
-            <el-steps :active="1">
+            <el-steps :active="percentage/20">
 
-              <el-step v-for="item in component_list" :title=item.value :icon=item.svg />
+              <el-step v-for="item in component_list" :key="item.value" :title=item.value :icon=item.svg />
             </el-steps>
           </el-card>
           <div>
             <el-row>
               <div style="width:30%">
                 <span style="font-weight:bolder; font-size: larger; display: inline-flex;">工艺对应产品：</span>
-                <span style="color:red;font-size: large;font-weight: bold;">{{ typevalue }}<el-icon>
+                <span style="color:blue;font-size: large;font-weight: bold;">{{ typevalue }}<el-icon>
                     <IceDrink />
                   </el-icon></span>
               </div>
@@ -274,7 +328,7 @@ function clearList() {
               </div>
 
               <div style="width:20%;text-align: right;">
-                <el-button type="primary" plain size="large">生产&nbsp;<el-icon>
+                <el-button type="primary" plain size="large" @click="percentage_increase">生产&nbsp;<el-icon>
                     <Shop />
                   </el-icon></el-button>
               </div>
@@ -283,7 +337,12 @@ function clearList() {
           </div>
 
         </el-card>
-        <img src="../assets/logo.png" style="width: 400px;" />
+        <el-card style="margin-top: 4vmin;">
+          <div>
+            <img :src="url" style=" margin-left: 1vmin; height: 40vmin;" />
+          </div>
+          <el-progress :percentage="percentage" :color="customColorMethod" :stroke-width="10" />
+        </el-card>
 
       </el-main>
     </el-container>
