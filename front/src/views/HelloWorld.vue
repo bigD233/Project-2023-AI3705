@@ -11,16 +11,13 @@ import img3 from '../assets/3.png'
 import img4 from '../assets/4.png'
 import img5 from '../assets/5.png'
 import img0 from '../assets/logo.png'
-import { markRaw, ref } from 'vue'
+import { markRaw, ref, inject, watch } from 'vue'
 // import SelectComp from '@/components/SelectComp.vue'
 // import Footer from '@/components/StartFooter.vue'
 
 
 const router = useRouter()
 
-function jump_to_login() {
-  router.push('/start')
-}
 
 var timer  //计时器
 const url = ref('')
@@ -34,6 +31,8 @@ const if_increase = ref(true)  //是否继续增长
 const if_disable = ref(false)
 const if_show = ref(true)  //是否展示走马灯
 // const remarkCaruselUp = ref(null)
+
+const axios = inject('axios'); //用于发送状态信息
 
 const img_lists = [
   {
@@ -131,17 +130,19 @@ function percentage_increase() {
 
 function increase() {
   var step = 100 / component_list.value.length
-  if(percentage.value<100){
+  if (percentage.value < 100) {
     if (Math.abs(percentage.value + step - 100) > 1) {
       percentage.value = Number((percentage.value + step).toFixed(1));
       count.value += 1;
+      console.log(count.value)
     }
     else {
       percentage.value = 100;
       count.value += 1;
+      console.log(count.value)
     }
   }
-  
+
 }
 
 
@@ -206,7 +207,7 @@ function checkCorrection() {
         typevalue.value = item.value;
         // setActiveItem(item.index)
         url.value = item.src
-        if_show.value=false;
+        if_show.value = false;
         console.log(item.src)
       }
     }
@@ -257,6 +258,45 @@ function clearList() {
   count.value = 0;
   if_show.value = true;
 }
+
+//监听count变化
+watch(count, (newCount) => {
+  // 在 count 变量发生变化时发送 POST 请求
+  if (newCount != 0) {
+    axios
+      .post('stage', { stage: component_list.value[newCount - 1].value,end: component_list.value.length-newCount }, {
+        headers: {
+          'Access-Control-Allow-Origin': 'http://localhost:5173'  // 替换为实际的前端域名
+        }
+      })
+      .then((response) => {
+        // console.log(component_list.value[newCount - 1])
+        console.log("Send the process stage successfully!");
+      })
+      .catch((error) => {
+        ElMessage.error(error)
+      })
+  }
+  else{
+    axios
+      .post('stage',{stage: '无',end:0},{
+        headers: {
+          'Access-Control-Allow-Origin': 'http://localhost:5173'  // 替换为实际的前端域名
+        }
+      })
+      .then((response) => {
+        // console.log(component_list.value[newCount - 1])
+        console.log("Send the process stage successfully!");
+      })
+      .catch((error) => {
+        ElMessage.error(error)
+      })
+  }
+});
+
+
+
+
 
 </script>
 
@@ -348,15 +388,16 @@ function clearList() {
         <el-card style="margin-top: 4vmin;">
           <div v-if="!if_show" style="height:40vmin">
             <img :src="url" style=" margin-left: 1vmin; width:100%" />
-            <el-progress :percentage="percentage" :color="customColorMethod" :stroke-width="10" style="margin-top: 1vmin;" />
+            <el-progress :percentage="percentage"  :stroke-width="10"
+              style="margin-top: 1vmin;" />
           </div>
           <el-carousel v-if="if_show" ref="remarkCaruselUp" autoplay :interval="4000" type="card"
             style=" margin-left: 1vmin; height: 40vmin; ">
             <el-carousel-item v-for="img in img_lists" :key="img" style="height: 50vmin; margin-left: 2vmin;">
               <div style=" height: 35vmin;">
-                <img :src="img0" style=" width: 100%;"/>
+                <img :src="img0" style=" width: 100%;" />
               </div>
-              
+
             </el-carousel-item>
           </el-carousel>
         </el-card>

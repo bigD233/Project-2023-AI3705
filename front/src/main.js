@@ -9,6 +9,10 @@ import axios from 'axios';
 
 const app = createApp(App);
 
+
+
+axios.defaults.baseURL = 'http://localhost:8443/api';
+
 app.provide('axios', axios);
 // app.use(router);
 // app.use(store);
