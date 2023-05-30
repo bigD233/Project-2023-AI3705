@@ -16,7 +16,9 @@ body {
 }
 
 #app {
+  background-color: #082d57;
   width: 100%;
   height: 100%;
+  color: white;
 }
 </style>

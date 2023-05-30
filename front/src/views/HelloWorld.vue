@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
+
 import Header from '@/components/StartHeader.vue'
 import {
   CirclePlus, Files, Select, CloseBold, IceDrink,
@@ -33,6 +34,11 @@ const if_show = ref(true)  //是否展示走马灯
 // const remarkCaruselUp = ref(null)
 
 const axios = inject('axios'); //用于发送状态信息
+const product_list=ref([]);
+for(var i=0;i<6;i++){
+  product_list.value.push(`/src/assets/imgs/page${i}.jpg`)
+}
+
 
 const img_lists = [
   {
@@ -310,9 +316,9 @@ watch(count, (newCount) => {
       <el-aside width="30vmax" style="margin-top: 7vmin;margin-left: 2vmax;">
 
         <!-- 选择种类部分 -->
-        <el-card class="box-card" style="margin-top: 2vmin">
+        <el-card class="box-card" style="margin-top: 2vmin ;background-color: #2F5597;">
           <div class="card-header">
-            <div>选择饮料种类</div>
+            <div style="font-weight: bold;color: white;">选择饮料种类</div>
 
             <el-select v-model="typevalue" filterable placeholder="选择要生产的饮料" size="large" @change="judgeSelect">
 
@@ -323,16 +329,16 @@ watch(count, (newCount) => {
 
 
         <!-- 选择工艺部分 -->
-        <el-card class="box-card" style="margin-top: 2vmin;">
+        <el-card class="box-card" style="margin-top: 2vmin;background-color: #2F5597;">
           <template #header>
             <div class="card-header">
-              <p>自选工艺类型</p>
+              <p style="font-weight: bold;color: white;">自选工艺类型</p>
               <el-button type="info" plain :icon="CirclePlus" :disabled="if_disable" @click="addComponent1">添加</el-button>
             </div>
           </template>
           <div class="mb-2 flex items-center text-sm">
 
-            <el-dialog v-model="dialogFormVisible" title="输入具体工艺名称" draggable style="width:22vmax" align-center>
+            <el-dialog v-model="dialogFormVisible" title="输入具体工艺名称" draggable style="width:22vmax;background-color: #d9ecff;" align-center>
 
               <el-select v-model="component" placeholder="输入多功能罐对应的工艺名称" size="large" style="width:100%">
                 <el-option v-for="item in otherComp" :key="item.value" :label=item.value :value=item.value />
@@ -354,28 +360,28 @@ watch(count, (newCount) => {
               <!-- <img src="../assets/component_svg/valve_model.svg"  style="width: 35%"/>
               
               <el-radio label="1" size="large" style="width:25% ;margin-left: 3vmax;">阀门(Valve)</el-radio> -->
-              <img src="../assets/component_svg/source tank model.svg" style="width: 35%" />
-              <el-radio label="源罐" size="large" :disabled="if_disable" style="width:25%;margin-left: 3vmax;">源罐(Source
+              <img src="../assets/component_svg/source tank model.svg" style="width: 35%;" />
+              <el-radio label="源罐" size="large" :disabled="if_disable" style="width:25%;margin-left: 3vmax;color: white;">源罐(Source
                 Tank)</el-radio>
-              <img src="../assets/component_svg/icing machine model.svg" style="width: 35%" />
-              <el-radio label="冷却" size="large" :disabled="if_disable" style="width:25%;margin-left: 3vmax;">冷却机(Icing
+              <img src="../assets/component_svg/icing machine model.svg" style="width: 35%;margin-top: 1vmin;" />
+              <el-radio label="冷却" size="large" :disabled="if_disable" style="width:25%;margin-left: 3vmax;color: white;">冷却机(Icing
                 Machine)</el-radio>
-              <img src="../assets/component_svg/FILLING TANK.svg" style="width: 35%" />
-              <el-radio label="灌装" size="large" :disabled="if_disable" style="width:25% ;margin-left: 3vmax;">罐装机(Filling
+              <img src="../assets/component_svg/FILLING TANK.svg" style="width: 35%;margin-top: 1vmin;" />
+              <el-radio label="灌装" size="large" :disabled="if_disable" style="width:25% ;margin-left: 3vmax;color: white;">罐装机(Filling
                 Machine)</el-radio>
-              <img src="../assets/component_svg/tank model.svg" style="width: 35%" />
-              <el-radio label="Tank" size="large" :disabled="if_disable" style="width:25%;margin-left: 3vmax;">多功能罐(Tank
+              <img src="../assets/component_svg/tank model.svg" style="width: 35%;margin-top: 1vmin;" />
+              <el-radio label="Tank" size="large" :disabled="if_disable" style="width:25%;margin-left: 3vmax;color: white;">多功能罐(Tank
                 Model)</el-radio>
-              <img src="../assets/component_svg/pasteurization.svg" style="width: 35%" />
+              <img src="../assets/component_svg/pasteurization.svg" style="width: 35%;margin-top: 1vmin;" />
               <el-radio label="杀菌" size="large" :disabled="if_disable"
-                style="width:25%;margin-left: 3vmax;">巴氏消毒(Pasteurization Machine)</el-radio>
+                style="width:25%;margin-left: 3vmax;color: white;">巴氏消毒(Pasteurization Machine)</el-radio>
             </el-radio-group>
           </div>
         </el-card>
 
       </el-aside>
 
-      <el-main width="50vmax" style="margin: 3vmin;">
+      <el-main width="50vmax" style="margin-top: 3vmin;margin-right: 3vmin;">
         <!-- 图片部分-->
 
         <!-- <el-card style="margin-top: 4vmin;">
@@ -385,18 +391,25 @@ watch(count, (newCount) => {
           <el-progress :percentage="percentage" :color="customColorMethod" :stroke-width="10" />
         </el-card> -->
 
-        <el-card style="margin-top: 4vmin;">
-          <div v-if="!if_show" style="height:40vmin">
-            <img :src="url" style=" margin-left: 1vmin; width:100%" />
-            <el-progress :percentage="percentage"  :stroke-width="10"
-              style="margin-top: 1vmin;" />
+        <el-card style="margin-top: 4vmin;background-color: #2F5597;;">
+          <div v-if="!if_show" style="height:43vmin">
+            <img :src="url" style="  width:100%" />
+            <el-progress :percentage="percentage"  :stroke-width="20" striped striped-flow :duration="5"
+              style="margin-top: 3vmin;" color="#c6e2ff"/>
           </div>
           <el-carousel v-if="if_show" ref="remarkCaruselUp" autoplay :interval="4000" type="card"
-            style=" margin-left: 1vmin; height: 40vmin; ">
-            <el-carousel-item v-for="img in img_lists" :key="img" style="height: 50vmin; margin-left: 2vmin;">
-              <div style=" height: 35vmin;">
-                <img :src="img0" style=" width: 100%;" />
-              </div>
+            style=" margin-left: 1vmin; height: 43vmin; ">
+            <el-carousel-item v-for="(sr,index) in product_list" :key="index" style="height: 40vmin; ">
+              
+              <el-card  style=" height: 96% ;width:96%;margin-top: 1vmin;" shadow="always">
+                <div v-if="index==0">
+                  <img  :src="sr"  style=" width: 105%;" />
+                </div>
+                
+                <div v-if="index!=0"  style="position:relative;left:35%;height: 100%;">
+                <img :src="sr"  style=" height: 100%;" />
+                </div>
+              </el-card>
 
             </el-carousel-item>
           </el-carousel>
@@ -406,15 +419,15 @@ watch(count, (newCount) => {
 
 
 
-
+        
         <!-- 流程部分-->
-        <el-card style="margin-top: 4vmin;">
+        <el-card style="margin-top: 3vmin;background-color: #2F5597;;">
 
-          <span style="font-weight:bolder; font-size: larger;">工艺流程：</span>
-          <el-button style="float:right" type="primary" @click="clearList"> 清除 &nbsp; <el-icon>
+          <span style="font-weight:bolder; font-size: larger;color: white;">工艺流程：</span>
+          <el-button style="float:right" type="primary" size="large" @click="clearList"> 清除 &nbsp; <el-icon>
               <DeleteFilled />
             </el-icon> </el-button>
-          <el-card style="width: 100% ;margin-top: 2vmin;margin-bottom: 2vmin;min-height: 10vmin;">
+          <el-card style="width: 100% ;margin-top: 4vmin;margin-bottom: 4vmin;min-height: 10vmin;">
             <el-steps :active="count">
 
               <el-step v-for="item in component_list" :key="item.value" :title=item.value :icon=item.svg />
@@ -422,19 +435,19 @@ watch(count, (newCount) => {
           </el-card>
           <div>
             <el-row>
-              <div style="width:30%">
-                <span style="font-weight:bolder; font-size: larger; display: inline-flex;">工艺对应产品：</span>
-                <span style="color:blue;font-size: large;font-weight: bold;">{{ typevalue }}<el-icon>
+              <div style="width:35%">
+                <span style="font-weight:bolder; font-size: larger; display: inline-flex;color: white;">工艺对应产品：</span>
+                <span style="color:rgb(7, 228, 248);font-size: large;font-weight: bold;">{{ typevalue }}<el-icon>
                     <IceDrink />
                   </el-icon></span>
               </div>
-              <div style="width:50%">
-                <span style="font-weight:bolder; font-size: larger; display: inline-flex;">生产数量：</span>
+              <div style="width:50%;color: white;">
+                <span style="font-weight:bolder; font-size: larger; display: inline-flex;color: white;">生产数量：</span>
                 <el-input-number v-model="num" :precision="0" :step="1000" :max="100000" /> 最小计数单位（瓶、罐、包）
               </div>
 
-              <div style="width:20%;text-align: right;">
-                <el-button type="primary" plain size="large" @click="percentage_increase">生产&nbsp;<el-icon>
+              <div style="width:15%;text-align: right;">
+                <el-button type="primary"  size="large" color="#626aef" @click="percentage_increase" >生产&nbsp;<el-icon>
                     <Shop />
                   </el-icon></el-button>
               </div>
@@ -462,6 +475,7 @@ watch(count, (newCount) => {
 
 
 <style>
+
 .quote-box {
   width: 100%;
   margin: 0px;

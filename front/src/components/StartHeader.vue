@@ -5,37 +5,48 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 function jump_to_start() {
-  router.push('/start')
+  router.push('art')
 }
 function jump_to_login() {
-  router.push('/start')
+  router.push('art')
 }
 function jump_to_signup() {
-  router.push('/start')
+  router.push('art')
 }
 
 </script> -->
 
 <template>
-  <div class="nav_bar">
-    <div class="text">食品饮料系统生产控制台</div>
+  <div class="title_class">
+    <img src="../assets/title3.png" style=" height:10vmin;" />
   </div>
 </template>
 
 <style scoped>
 
 .nav_bar {
-  background-color:  #dedfe0;
+  background: url() no-repeat ;
+  background-size: contain;
+  background-position: center;
+
   height: 10vmin;
+}
+
+.title_class{
+  display:flex ;
+  justify-content:center ;
+  align-items: center;
 }
 
 .text{
   height:10vmin;
   line-height:10vmin;
   font-size: 5vmin;
-  font-family: FangSong,"微软雅黑",sans-serif;
+  font-family: ARIAL,"微软雅黑",sans-serif;
   text-align:center;
- font-weight: bold;
+  font-weight: bold;
   margin: auto;
 }
+
 </style>
+
