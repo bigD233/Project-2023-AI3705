@@ -11,7 +11,9 @@ import img2 from '../assets/2.png'
 import img3 from '../assets/3.png'
 import img4 from '../assets/4.png'
 import img5 from '../assets/5.png'
-import img0 from '../assets/logo.png'
+import img6 from '../assets/6.jpg'
+import img7 from '../assets/7.jpg'
+import img8 from '../assets/8.jpg'
 import { markRaw, ref, inject, watch } from 'vue'
 // import SelectComp from '@/components/SelectComp.vue'
 // import Footer from '@/components/StartFooter.vue'
@@ -20,6 +22,7 @@ import { markRaw, ref, inject, watch } from 'vue'
 const router = useRouter()
 
 
+const status=ref('') //进度条状态
 var timer  //计时器
 const url = ref('')
 const count = ref(0)  //进度条计数
@@ -35,28 +38,28 @@ const if_show = ref(true)  //是否展示走马灯
 
 const axios = inject('axios'); //用于发送状态信息
 const product_list=ref([]);
-for(var i=0;i<6;i++){
+for(var i=0;i<9;i++){
   product_list.value.push(`/src/assets/imgs/page${i}.jpg`)
 }
 
 
-const img_lists = [
-  {
-    value: img1
-  },
-  {
-    value: img2
-  },
-  {
-    value: img3
-  },
-  {
-    value: img4
-  },
-  {
-    value: img5
-  },
-]
+// const img_lists = [
+//   {
+//     value: img1
+//   },
+//   {
+//     value: img2
+//   },
+//   {
+//     value: img3
+//   },
+//   {
+//     value: img4
+//   },
+//   {
+//     value: img5
+//   },
+// ]
 
 const options = [
   {
@@ -94,6 +97,26 @@ const options = [
     src: img5,
     index: 4
   },
+  {
+    value:'蜂蜜饮料',
+    label:'蜂蜜饮料',
+    process:['源罐','稀释','调配','过滤','杀菌', '灌装'],
+    src:img6,
+    index:5
+  },
+  {
+    value:'功能饮料',
+    label:'功能饮料',
+    process:['源罐','调配','加热','杀菌', '灌装'],
+    src:img7,
+    index:6
+  },{
+    value:'植物蛋白饮料',
+    label:'植物蛋白饮料',
+    process:['源罐','调配','过滤','杀菌', '灌装'],
+    src:img8,
+    index:7
+  }
 ]
 
 const otherComp = [
@@ -143,6 +166,7 @@ function increase() {
       console.log(count.value)
     }
     else {
+      status.value='success'
       percentage.value = 100;
       count.value += 1;
       console.log(count.value)
@@ -263,6 +287,7 @@ function clearList() {
   url.value = '';
   count.value = 0;
   if_show.value = true;
+  status.value='';
 }
 
 //监听count变化
@@ -394,8 +419,8 @@ watch(count, (newCount) => {
         <el-card style="margin-top: 4vmin;background-color: #2F5597;;">
           <div v-if="!if_show" style="height:43vmin">
             <img :src="url" style="  width:100%" />
-            <el-progress :percentage="percentage"  :stroke-width="20" striped striped-flow :duration="5"
-              style="margin-top: 3vmin;" color="#c6e2ff"/>
+            <el-progress :percentage="percentage"  :stroke-width="20" striped :striped-flow="status==''" :duration="1" :text-inside="true" :status="status"
+              style="margin-top: 3vmin;" />
           </div>
           <el-carousel v-if="if_show" ref="remarkCaruselUp" autoplay :interval="4000" type="card"
             style=" margin-left: 1vmin; height: 43vmin; ">
