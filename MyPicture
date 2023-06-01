@@ -1,0 +1,10 @@
+graph "Structure graph" {
+	rankdir=LR
+	Source_Tank [shapefile="./test/Source_Tank.png"]
+	Icing_Machine [shapefile="./test/Icing_Machine.png"]
+	Source_Tank -- Icing_Machine [fontsize="60pt" minlen=1]
+	Filling_Machine [shapefile="./test/Filling_Machine.png"]
+	Icing_Machine -- Filling_Machine [fontsize="60pt" minlen=1]
+	P_machine [shapefile="./test/P_machine.png"]
+	Filling_Machine -- P_machine [fontsize="60pt" minlen=1]
+}
