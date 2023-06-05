@@ -54,24 +54,19 @@ for (var i = 0; i < 9; i++) {
 var ws = new WebSocket(
   `ws://localhost:8443/Linestatus`
 );
-var ws1 = new WebSocket(
-  `ws://localhost:8443/operation`
-)
-
 
 ws.onopen = function (evt) {
   console.log("Connection1 open ...");
   if_connection1.value = true;
-
 };
 
-ws1.onopen = function (evt) {
-  console.log("Connection2 open ...");
-  if_connection2.value = true;
+ws.onmessage = function (e) {
+console.log(JSON.parse(e.data));
+count.value = JSON.parse(e.data)['pointer']
+percentage.value = Number((JSON.parse(e.data)['current_batch'] * 100 / num.value).toFixed(1))
 
+linestatus.value = JSON.parse(e.data)['Line']
 };
-
-
 
 function send() {
   if_show1.value=true;
@@ -88,6 +83,26 @@ function send() {
 
 }
 
+
+
+
+
+var ws1 = new WebSocket(
+  `ws://localhost:8443/operation`
+)
+
+
+
+
+ws1.onopen = function (evt) {
+  console.log("Connection2 open ...");
+  if_connection2.value = true;
+
+};
+
+
+
+
 function send_operation() {
   ws1.send(operation.value)
 }
@@ -101,15 +116,7 @@ ws1.onmessage = function (e) {
 }
 
 
-ws.onmessage = function (e) {
 
-  console.log(JSON.parse(e.data));
-  count.value = JSON.parse(e.data)['pointer']
-  percentage.value = Number((JSON.parse(e.data)['current_batch'] * 100 / num.value).toFixed(1))
-
-  linestatus.value = JSON.parse(e.data)['Line']
-
-};
 // 4.卸载前, 关闭链接
 onUnmounted(() => {
   ws.close();
