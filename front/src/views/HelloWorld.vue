@@ -51,6 +51,8 @@ for (var i = 0; i < 9; i++) {
   product_list.value.push(`/src/assets/imgs/page${i}.jpg`)
 }
 
+
+
 var ws = new WebSocket(
   `ws://localhost:8443/Linestatus`
 );
@@ -123,26 +125,6 @@ onUnmounted(() => {
   ws1.close();
 
 });
-
-
-
-// const img_lists = [
-//   {
-//     value: img1
-//   },
-//   {
-//     value: img2
-//   },
-//   {
-//     value: img3
-//   },
-//   {
-//     value: img4
-//   },
-//   {
-//     value: img5
-//   },
-// ]
 
 const options = [
   {
@@ -239,7 +221,6 @@ function percentage_increase() {
   }
 }
 
-
 function increase() {
   var step = 100 / component_list.value.length
   if (percentage.value < 100) {
@@ -257,9 +238,6 @@ function increase() {
   }
 
 }
-
-
-
 
 function judgeSelect() {  //选择饮料
   if (typevalue.value != '') {
@@ -327,7 +305,6 @@ function checkCorrection() {
   }
 }
 
-
 function addComponent(component, num) {
 
 
@@ -374,41 +351,6 @@ function clearList() {
   linestatus.value = '空闲';
   num.value = 1000;
 }
-
-//监听count变化
-// watch(count, (newCount) => {
-//   // 在 count 变量发生变化时发送 POST 请求
-//   if (newCount != 0) {
-//     axios
-//       .post('stage', { stage: component_list.value[newCount - 1].value, end: component_list.value.length - newCount }, {
-//         headers: {
-//           'Access-Control-Allow-Origin': 'http://localhost:5173'  // 替换为实际的前端域名
-//         }
-//       })
-//       .then((response) => {
-//         // console.log(component_list.value[newCount - 1])
-//         console.log("Send the process stage successfully!");
-//       })
-//       .catch((error) => {
-//         ElMessage.error("向服务器传输工艺指令过程中出错！")
-//       })
-//   }
-//   else {
-//     axios
-//       .post('stage', { stage: '无', end: 0 }, {
-//         headers: {
-//           'Access-Control-Allow-Origin': 'http://localhost:5173'  // 替换为实际的前端域名
-//         }
-//       })
-//       .then((response) => {
-//         // console.log(component_list.value[newCount - 1])
-//         console.log("Send the process stage successfully!");
-//       })
-//       .catch((error) => {
-//         ElMessage.error("向服务器传输工艺指令过程中出错！")
-//       })
-//   }
-// });
 
 
 
@@ -606,9 +548,7 @@ function clearList() {
 
       </el-main>
     </el-container>
-    <!--    <el-footer height="220px" class="footer">-->
-    <!--      <Footer />-->
-    <!--    </el-footer>-->
+ 
   </el-container>
 </template>
 
